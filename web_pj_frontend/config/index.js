@@ -6,15 +6,32 @@ const path = require('path')
 
 module.exports = {
   dev: {
-
-    // Paths
+	// Paths
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/',
-    proxyTable: {},
+    assetsPublicPath: '/', 
+    proxy: {
+      '/api': { //http请求，主要是aixos
+        target: 'http://localhost:8080',
+		secure: false,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': ''
+        }
+      },
+	  '/socket':{ //websocket请求
+		  target: 'http://localhost:8081',
+		  // ws: true,
+		  secure: false,
+		  changeOrigin: true,
+		  pathRewrite: {
+			  '^/socket':''
+		  }
+	  }
+    },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
-    port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
+    port: 80, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: false,
     errorOverlay: true,
     notifyOnErrors: true,

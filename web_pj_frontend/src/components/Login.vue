@@ -63,6 +63,7 @@
 
 <script>
 	export default{
+		name:'Login',
 		data(){
 			return{
 				loginForm:{
@@ -85,24 +86,53 @@
 				})
 			},
 			login(){
-				this.$router.push({
-					path: 'home',
-					query: {
-						username: this.loginForm.loginUsername
-					}
-				});
+				this.$socket.emit("login",{
+					username: this.loginForm.loginUsername,
+					password: this.loginForm.loginPassword
+				})
 			},
 			register(){
-				this.$router.push({
-					path: 'home',
-					query: {
-						username: this.loginForm.loginUsername
-					}
-				});
+				this.$socket.emit("register",{
+					username: this.registerForm.registerUsername,
+					password: this.registerForm.registerPassword
+				})
 			},
 		},
 		mounted(){
-			this.name = this.$route.name
+			this.name = this.$route.name;
+		},
+		sockets:{
+			open: function(){
+				console.log('Socket opened.');
+			},
+			registerSuccess: function(data){
+				console.log('Registration succeeds.');
+				this.$store.commit('login',{
+					username: this.registerForm.registerUsername,
+					token: data.token
+				});
+				this.$router.push({
+					path: 'home',
+					params:{
+						username: this.registerForm.registerUsername,
+						data: data
+					}
+				});
+			},
+			loginSuccess: function(data){
+				console.log('Login succeeds.');
+				this.$store.commit('login',{
+					username: this.loginForm.loginUsername,
+					token: data.token
+				});
+				this.$router.push({
+					path: 'home',
+					params:{
+						username: this.loginForm.loginUsername,
+						data: data
+					}
+				});
+			}
 		}
 	}
 </script>

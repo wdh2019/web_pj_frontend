@@ -1,5 +1,11 @@
 <template>
-    <div id="container"></div>
+	<div class="out">
+		<el-row id="header">
+			<span>欢迎{{username}}</span>
+			<el-button type="primary" @click="logout">登出</el-button>
+		</el-row>
+		<div id="container"></div>
+	</div>
 </template>
 <script>
 import * as Three from 'three'
@@ -10,7 +16,8 @@ export default {
       camera: null,
       scene: null,
       renderer: null,
-      mesh: null
+      mesh: null,
+	  username: null
     }
   },
   methods: {
@@ -33,7 +40,18 @@ export default {
       this.mesh.rotation.x += 0.01
       this.mesh.rotation.y += 0.02
       this.renderer.render(this.scene, this.camera)
-    }
+    },
+	logout: function (){
+		//关闭连接
+		this.$socket.emit('close',{ 
+			username: this.$store.state.username,
+			token: this.$store.state.token
+		});
+		//调用vuex mutations中logout方法
+		this.$store.commit('logout');
+		//重定向到登录界面
+		this.$router.push('/');
+	}
   },
   mounted () {
     this.init()
@@ -43,6 +61,15 @@ export default {
 </script>
 
 <style scoped>
+.out{
+	width: 100%;
+	height: 100%;
+	text-align: right;
+	color: white;
+}
+#header{
+	background-color: rgba(0,0,0,0.8);
+}
 #container {
 	width: 100%;
     height: 100%;
