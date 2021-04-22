@@ -1,12 +1,10 @@
 <template>
-  <h-page-container>
     <div id="container"></div>
-  </h-page-container>
 </template>
 <script>
 import * as Three from 'three'
 export default {
-  name: 'Hello',
+  name: 'home',
   data () {
     return {
       camera: null,
@@ -46,6 +44,7 @@ export default {
 
 <style scoped>
 #container {
-    height: 400px;
-  }
+	width: 100%;
+    height: 100%;
+}
 </style>
