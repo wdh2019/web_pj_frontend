@@ -1,9 +1,9 @@
 <template>
 	<div class="container">
 		<div class="login form" v-show="name==='login'">
-			<el-form id="loginForm" v-model="loginForm">
+			<el-form id="loginForm" :model="loginForm" :rules="loginRules" ref="loginForm">
 				<h3>登录</h3>
-				<el-form-item>
+				<el-form-item prop="loginUsername">
 					<div class="inputContainer">
 						<input class="input" type="text" placeholder="请输入用户名" v-model="loginForm.loginUsername">
 						<span class="left"></span>
@@ -12,7 +12,7 @@
 						<span class="bottom"></span>
 					</div>
 				</el-form-item>
-				<el-form-item>
+				<el-form-item prop="loginPassword">
 					<div class="inputContainer">
 						<input class="input" type="password" placeholder="请输入密码" v-model="loginForm.loginPassword">
 						<span class="left"></span>
@@ -30,9 +30,9 @@
 			</el-form>
 		</div>
 		<div class="register form" v-show="name==='register'">
-			<el-form id="registerForm" v-show="registerForm">
+			<el-form id="registerForm" :model="registerForm" :rules="registerRules" ref="registerForm">
 				<h3>注册</h3>
-				<el-form-item>
+				<el-form-item prop="registerUsername">
 					<div class="inputContainer">
 						<input class="input" type="text" placeholder="请输入用户名" v-model="registerForm.registerUsername">
 						<span class="left"></span>
@@ -41,7 +41,7 @@
 						<span class="bottom"></span>
 					</div>
 				</el-form-item>
-				<el-form-item>
+				<el-form-item prop="registerPassword">
 					<div class="inputContainer">
 						<input class="input" type="password" placeholder="请输入密码" v-model="registerForm.registerPassword">
 						<span class="left"></span>
@@ -62,6 +62,8 @@
 </template>
 
 <script>
+	import io from 'socket.io-client'
+	const socket = io('http://127.0.0.1:8081');
 	export default{
 		name:'Login',
 		data(){
@@ -70,9 +72,25 @@
 					loginUsername:"",
 					loginPassword:""
 				},
+				loginRules:{
+					loginUsername:[
+						{required: true, message: '请输入用户名', trigger: 'blur'}
+					],
+					loginPassword:[
+						{required: true, message: '请输入密码', trigger: 'blur'}
+					]
+				},
 				registerForm:{
 					registerUsername:"",
 					registerPassword:""
+				},
+				registerRules:{
+					registerUsername:[
+						{required: true, message: '请输入用户名', trigger: 'blur'}
+					],
+					registerPassword:[
+						{required: true, message: '请输入密码', trigger: 'blur'}
+					]
 				},
 				name:"",
 				activeNames: ['1']
@@ -86,53 +104,70 @@
 				})
 			},
 			login(){
-				this.$socket.emit("login",{
-					username: this.loginForm.loginUsername,
-					password: this.loginForm.loginPassword
-				})
+				this.$refs['loginForm'].validate((valid)=>{
+					if(valid){
+						socket.emit("login",{
+							username: this.loginForm.loginUsername,
+							password: this.loginForm.loginPassword
+						})
+					}
+				});
 			},
 			register(){
-				this.$socket.emit("register",{
-					username: this.registerForm.registerUsername,
-					password: this.registerForm.registerPassword
-				})
+				this.$refs['registerForm'].validate((valid)=>{
+					if(valid){
+						socket.emit("register",{
+							username: this.registerForm.registerUsername,
+							password: this.registerForm.registerPassword
+						})
+					}
+				});
 			},
 		},
 		mounted(){
 			this.name = this.$route.name;
 		},
-		sockets:{
-			open: function(){
-				console.log('Socket opened.');
-			},
-			registerSuccess: function(data){
+		created(){
+			socket.on('open',(data)=>{
+				console.log('Socket opened');
+			});
+			socket.on('registerSuccess',(data)=>{
 				console.log('Registration succeeds.');
 				this.$store.commit('login',{
 					username: this.registerForm.registerUsername,
 					token: data.token
 				});
+				this.$store.commit('setSocket',socket); //把socket存入全局变量，方便后续页面存取
+				console.log(this.$store.state.socket);
 				this.$router.push({
-					path: 'home',
+					path: '/home',
 					params:{
 						username: this.registerForm.registerUsername,
 						data: data
 					}
 				});
-			},
-			loginSuccess: function(data){
+			});
+			socket.on('loginSuccess',(data)=>{
 				console.log('Login succeeds.');
 				this.$store.commit('login',{
 					username: this.loginForm.loginUsername,
 					token: data.token
 				});
+				this.$store.commit('setSocket',socket);
+				console.log(this.$store.state.socket);
 				this.$router.push({
-					path: 'home',
+					path: '/home',
 					params:{
 						username: this.loginForm.loginUsername,
 						data: data
 					}
 				});
-			}
+			});
+		},
+		destroyed() {
+			socket.removeListener('open');
+			socket.removeListener('registerSuccess');
+			socket.removeListener('loginSuccess');
 		}
 	}
 </script>
@@ -180,7 +215,8 @@
 		box-sizing: border-box;
 		padding-left: 5px;
 		background-color: inherit;
-		caret-color: #61dafb
+		caret-color: #61dafb;
+		color: white
 	}
 	.inputContainer span{
 		position: absolute;

@@ -9,6 +9,9 @@
 </template>
 <script>
 import * as Three from 'three'
+import store from '../store'
+const socket = store.state.socket;
+
 export default {
   name: 'home',
   data () {
@@ -17,11 +20,12 @@ export default {
       scene: null,
       renderer: null,
       mesh: null,
-	  username: null
+	  username: null,
+	  
     }
   },
   methods: {
-    init: function () {
+    init() {
       let container = document.getElementById('container')
       this.camera = new Three.PerspectiveCamera(70, container.clientWidth / container.clientHeight, 0.01, 10)
       this.camera.position.z = 0.6
@@ -35,18 +39,17 @@ export default {
       this.renderer.setSize(container.clientWidth, container.clientHeight)
       container.appendChild(this.renderer.domElement)
     },
-    animate: function () {
+    animate() {
       requestAnimationFrame(this.animate)
       this.mesh.rotation.x += 0.01
       this.mesh.rotation.y += 0.02
       this.renderer.render(this.scene, this.camera)
     },
-	logout: function (){
+	logout(){
 		//关闭连接
-		this.$socket.emit('close',{ 
-			username: this.$store.state.username,
-			token: this.$store.state.token
-		});
+		socket.close();
+		//清除socket变量
+		this.$store.commit('removeSocket');
 		//调用vuex mutations中logout方法
 		this.$store.commit('logout');
 		//重定向到登录界面

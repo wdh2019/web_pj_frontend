@@ -9,7 +9,7 @@ module.exports = {
 	// Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/', 
-    proxy: {
+    proxyTable: {
       '/api': { //http请求，主要是aixos
         target: 'http://localhost:8080',
 		secure: false,
@@ -18,14 +18,17 @@ module.exports = {
           '^/api': ''
         }
       },
-	  '/socket':{ //websocket请求
-		  target: 'http://localhost:8081',
-		  // ws: true,
-		  secure: false,
-		  changeOrigin: true,
-		  pathRewrite: {
-			  '^/socket':''
-		  }
+	  '/socket.io':{ //websocket请求
+		target: 'http://127.0.0.1:8081',
+		// ws: true,
+		// secure: false,
+		changeOrigin: true,
+		logLevel: 'debug'
+	  },
+	  '/sockjs-node':{
+		  target: 'http://127.0.0.1:8081',
+		  ws: false,
+		  changeOrigin: true
 	  }
     },
 
