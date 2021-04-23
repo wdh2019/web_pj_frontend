@@ -62,10 +62,11 @@
 </template>
 
 <script>
-	import io from 'socket.io-client'
-	const socket = io('http://127.0.0.1:8081');
+	//import io from 'socket.io-client'
+	//const socket = io('http://127.0.0.1:8081');
+	var socket;
 	export default{
-		name:'Login',
+		name:'login',
 		data(){
 			return{
 				loginForm:{
@@ -104,22 +105,61 @@
 				})
 			},
 			login(){
+				this.$router.push("/home");
 				this.$refs['loginForm'].validate((valid)=>{
-					if(valid){
-						socket.emit("login",{
+					if (valid) {
+						this.$axios.post('/login', {
 							username: this.loginForm.loginUsername,
 							password: this.loginForm.loginPassword
-						})
+					})
+						.then(resp => {
+							if (resp.status === 200 && resp.data.message == "success") { //登录成功
+								this.$store.commit('login', {
+									username: this.loginForm.loginUsername
+								});
+								this.$router.push("/home");
+							}
+							else {
+								this.$message({
+									showClose: true,
+									message: "登录失败",
+									type: 'warning'
+								});
+								console.log(resp.data.message);
+							}
+					    })
+						.catch(error => {
+							console.log(error);
+					    })
 					}
 				});
 			},
 			register(){
 				this.$refs['registerForm'].validate((valid)=>{
-					if(valid){
-						socket.emit("register",{
+					if (valid) {
+						this.$axios.post('/register', {
 							username: this.registerForm.registerUsername,
 							password: this.registerForm.registerPassword
-						})
+					})
+						.then(resp => {
+							if (resp.status === 200 && resp.data.message == "success") { //注册成功
+								this.$store.commit('login', { // 保存username，和login一样
+									username: this.registerForm.registerUsername
+								});
+								this.$router.push("/home");
+							}
+							else {
+								this.$message({
+									showClose: true,
+									message: "注册失败",
+									type: 'warning'
+								});
+								console.log(resp.data.message);
+							}
+					    })
+						.catch(error => {
+							console.log(error);
+					    })
 					}
 				});
 			},
@@ -127,48 +167,6 @@
 		mounted(){
 			this.name = this.$route.name;
 		},
-		created(){
-			socket.on('open',(data)=>{
-				console.log('Socket opened');
-			});
-			socket.on('registerSuccess',(data)=>{
-				console.log('Registration succeeds.');
-				this.$store.commit('login',{
-					username: this.registerForm.registerUsername,
-					token: data.token
-				});
-				this.$store.commit('setSocket',socket); //把socket存入全局变量，方便后续页面存取
-				console.log(this.$store.state.socket);
-				this.$router.push({
-					path: '/home',
-					params:{
-						username: this.registerForm.registerUsername,
-						data: data
-					}
-				});
-			});
-			socket.on('loginSuccess',(data)=>{
-				console.log('Login succeeds.');
-				this.$store.commit('login',{
-					username: this.loginForm.loginUsername,
-					token: data.token
-				});
-				this.$store.commit('setSocket',socket);
-				console.log(this.$store.state.socket);
-				this.$router.push({
-					path: '/home',
-					params:{
-						username: this.loginForm.loginUsername,
-						data: data
-					}
-				});
-			});
-		},
-		destroyed() {
-			socket.removeListener('open');
-			socket.removeListener('registerSuccess');
-			socket.removeListener('loginSuccess');
-		}
 	}
 </script>
 	

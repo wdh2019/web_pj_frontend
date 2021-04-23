@@ -5,27 +5,27 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-	  username: localStorage.getItem('username') || null,
-	  token: localStorage.getItem('token') || null,
-	  socket: null
+	  username: sessionStorage.getItem('username') || null,
+	  hasSocket: sessionStorage.getItem('hasSocket') || null,
+	  socket: null,
   },
   mutations: {
 	  login(state, data){
-		  localStorage.setItem('username', data.username);
-		  localStorage.setItem('token', data.token);
+		  sessionStorage.setItem('username', data.username);
 		  state.username = data.username;
 		  state.token = data.token;
 	  },
 	  logout(state){
-		  localStorage.removeItem('username');
-		  localStorage.removeItem('token');
+		  sessionStorage.removeItem('username');
 		  state.username = null;
 		  state.token = null;
 	  },
 	  setSocket(state, socket){
+		  sessionStorage.setItem('hasSocket',true);
 		  state.socket = socket;
 	  },
 	  removeSocket(state){
+		  sessionStorage.removeItem('hasSocket');
 		  state.socket = null;
 	  }
   },

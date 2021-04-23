@@ -4,7 +4,7 @@ import Vue from 'vue'
 import VueSocketIO from 'vue-socket.io'
 import SocketIO from 'socket.io-client'
 import App from './App'
-import router from './router'
+import {router} from './router'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import Vuex from 'vuex'
@@ -17,7 +17,7 @@ Vue.use(Vuex)
 //axios 配置
 // Axios挂载到Vue原型，全局可以使用this.$axios访问
 Vue.prototype.$axios = axios
-axios.defaults.baseURL = '/api'
+axios.defaults.baseURL = 'http://localhost:8080/api'
 axios.defaults.withCredentials = true
 axios.defaults.headers.post['Content-Type'] = "application/json;charset=UTF-8"
 //将SocketIO挂载到Vue原型
