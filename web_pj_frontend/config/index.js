@@ -8,9 +8,9 @@ module.exports = {
   dev: {
 	// Paths
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/', 
+    assetsPublicPath: '/',
     proxyTable: {
-      '/api': { //http请求，主要是aixos
+      '/api': { //http请求，主要是axios
         target: 'http://localhost:8080',
 		secure: false,
         changeOrigin: true,
@@ -40,7 +40,7 @@ module.exports = {
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
 
-    
+
     /**
      * Source Maps
      */

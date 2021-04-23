@@ -105,7 +105,6 @@
 				})
 			},
 			login(){
-				this.$router.push("/home");
 				this.$refs['loginForm'].validate((valid)=>{
 					if (valid) {
 						this.$axios.post('/login', {
@@ -113,7 +112,7 @@
 							password: this.loginForm.loginPassword
 					})
 						.then(resp => {
-							if (resp.status === 200 && resp.data.message == "success") { //登录成功
+							if (resp.status === 200 && resp.data.message === "success") { //登录成功
 								this.$store.commit('login', {
 									username: this.loginForm.loginUsername
 								});
@@ -142,7 +141,7 @@
 							password: this.registerForm.registerPassword
 					})
 						.then(resp => {
-							if (resp.status === 200 && resp.data.message == "success") { //注册成功
+							if (resp.status === 200 && resp.data.message === "success") { //注册成功
 								this.$store.commit('login', { // 保存username，和login一样
 									username: this.registerForm.registerUsername
 								});
@@ -169,7 +168,7 @@
 		},
 	}
 </script>
-	
+
 <style scoped>
 	.container{
 		margin:0;
@@ -190,7 +189,7 @@
 		padding:10px 40px 0px 40px;
 		background-color: rgba(0,0,0,0.3);
 		border-radius: 15px;
-		
+
 		backdrop-filter: blur(3px);
 		border-left: 2px solid rgba(0,0,0,0.5);
 		border-top: 2px solid rgba(0,0,0,0.5);
@@ -265,7 +264,7 @@
 		transform: scaleY(1);
 		transform-origin: top center;
 	}
-	
+
 	/* 按钮样式 */
 	.el-button.solid_button{
 		position: relative;
@@ -294,18 +293,18 @@
 	}
 	.el-button.solid_button:hover{
 		animation: sun 8s infinite;
-	}	
+	}
 	@keyframes sun{
 		100%{
 			background-position:-400% 0;
 		}
 	}
-	
+
 	.text_button{
 		color:rgb(255,255,255);
 	}
 	.text_button:hover{
 		color:#61dafb;
 	}
-	
+
 </style>

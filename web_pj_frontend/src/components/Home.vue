@@ -67,6 +67,7 @@
 		this.username = this.$store.state.username;
 		let hasSocket = this.$store.state.hasSocket;
 		if(!hasSocket){
+		  this.$alert("ok")
 			socket = io('http://127.0.0.1:8081');
 			this.$store.commit('setSocket',socket);
 			socket.on('connected', data => {
@@ -85,6 +86,7 @@
 			this.logout();
 		}
 	}
+
 }
 </script>
 
@@ -133,7 +135,7 @@
 	}
 	.el-button.solid_button:hover{
 		animation: sun 8s infinite;
-	}	
+	}
 	@keyframes sun{
 		100%{
 			background-position:-400% 0;
