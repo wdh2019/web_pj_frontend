@@ -20,8 +20,15 @@ Vue.prototype.$axios = axios
 axios.defaults.baseURL = '/api'
 axios.defaults.withCredentials = true
 axios.defaults.headers.post['Content-Type'] = "application/json;charset=UTF-8"
-//将SocketIO挂载到Vue原型
-Vue.prototype.$io = SocketIO
+Vue.use(
+	new VueSocketIO({
+		debug: true,
+		connection: 'http://127.0.0.1:8081',
+		options:{
+			autoConnect: false
+		},
+	})
+)
 
 /* eslint-disable no-new */
 new Vue({
