@@ -1,10 +1,10 @@
 <template>
 	<div class="container">
 		<el-row id="header">
-			<span>欢迎{{username}}</span>
-			<el-button class="solid_button" @click="logout">登出</el-button>
+			<el-col :offset="21" :span="2" :xs="2" :sm="2" :md="2" :lg="2" :xl="2"><i class="el-icon-user"></i> <span>用户{{username}}</span></el-col>
+			<el-col :span="1" :xs="1" :sm="1" :md="1" :lg="1" :xl="1"><el-button class="solid_button" @click="logout">登出</el-button></el-col>
 		</el-row>
-		<h3 id="warning" v-if="success===true"></h3>
+		<h3 id="warning" v-if="!success"></h3>
 		<div id="main"></div>
 	</div>
 </template>
@@ -44,11 +44,16 @@
 			this.mesh.rotation.y += 0.02
 			this.renderer.render(this.scene, this.camera)
 		},
+		//窗口改变大小时触发
+		onWindowResize(){
+			let container = document.getElementById('main');
+			this.camera.aspect = container.clientWidth / container.clientHeight;
+			this.camera.updateProjectionMatrix();
+			this.renderer.setSize(container.clientWidth, container.clientHeight);
+		},
 		logout(){
 			//关闭连接
 			this.$socket.close();
-			//清除socket变量
-			this.$store.commit('removeSocket');
 			//调用vuex mutations中logout方法
 			this.$store.commit('logout');
 			//重定向到登录界面
@@ -57,10 +62,13 @@
 	},
 	mounted(){
 		this.username = this.$store.state.username;
+		var _this = this;
 		//刷新页面则重定向到登录页面
 		window.addEventListener('beforeunload', e => {
-			this.logout();
-		})
+			_this.logout();
+		});
+		//窗口改变大小时，改变canvas大小
+		window.addEventListener('resize', this.onWindowResize);
 		//打开vue-socket.io
 		this.$socket.open()
 	},
@@ -73,13 +81,14 @@
 		},
 		connected: function(data){
 			console.log('Socket connected');
+			let warning = document.querySelector('#warning');
 			if(data.message === "success"){
 				this.success = true;
 				this.init();
 				this.animate();
 			}
 			else{
-				document.querySelector('#warning').innerHTML = '与服务器连接失败';
+				warning.innerHTML = '与服务器连接失败';
 			}
 		},
 		disconnected: function(data){
@@ -101,7 +110,10 @@
 	#header{
 		background-color: rgba(0,0,0,0.8);
 		color: white;
-		text-align: right;
+		text-align: center;
+	}
+	#header .el-col{
+		line-height: 3.125rem;
 	}
 	#warning{
 		text-align: center;
