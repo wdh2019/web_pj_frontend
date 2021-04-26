@@ -19,14 +19,14 @@ module.exports = {
         }
       },
 	  '/socket.io':{ //websocket请求
-		target: 'http://127.0.0.1:8081',
+		target: 'http://localhost:8081',
 		// ws: true,
 		// secure: false,
 		changeOrigin: true,
 		logLevel: 'debug'
 	  },
 	  '/sockjs-node':{
-		  target: 'http://127.0.0.1:8081',
+		  target: 'http://localhost:8081',
 		  ws: false,
 		  changeOrigin: true
 	  }

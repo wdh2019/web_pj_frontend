@@ -1,7 +1,7 @@
 <template>
 	<div class="container">
 		<el-row id="header">
-			<el-col :offset="21" :span="2" :xs="2" :sm="2" :md="2" :lg="2" :xl="2"><i class="el-icon-user"></i> <span>用户{{username}}</span></el-col>
+			<el-col :offset="20" :span="3" :xs="3" :sm="3" :md="3" :lg="3" :xl="3"><i class="el-icon-user"></i> <span>用户{{username}}</span></el-col>
 			<el-col :span="1" :xs="1" :sm="1" :md="1" :lg="1" :xl="1"><el-button class="solid_button" @click="logout">登出</el-button></el-col>
 		</el-row>
 		<h3 id="warning" v-if="!success"></h3>
@@ -46,10 +46,12 @@
 		},
 		//窗口改变大小时触发
 		onWindowResize(){
-			let container = document.getElementById('main');
-			this.camera.aspect = container.clientWidth / container.clientHeight;
-			this.camera.updateProjectionMatrix();
-			this.renderer.setSize(container.clientWidth, container.clientHeight);
+			if(this.camera!=null){
+				let container = document.getElementById('main');
+				this.camera.aspect = container.clientWidth / container.clientHeight;
+				this.camera.updateProjectionMatrix();
+				this.renderer.setSize(container.clientWidth, container.clientHeight);
+			}
 		},
 		logout(){
 			//关闭连接
