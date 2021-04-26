@@ -23,7 +23,8 @@ axios.defaults.headers.post['Content-Type'] = "application/json;charset=UTF-8"
 Vue.use(
 	new VueSocketIO({
 		debug: true,
-		connection: 'http://localhost:8081',
+		//connection: 'http://localhost:8081',
+		connection: 'http://54.205.181.44:8081',
 		options:{
 			autoConnect: false
 		},
