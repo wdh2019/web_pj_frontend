@@ -56,49 +56,58 @@
 		logout(){
 			//关闭连接
 			this.$socket.close();
-			//调用vuex mutations中logout方法
-			this.$store.commit('logout');
-			//重定向到登录界面
-			this.$router.push('/login');
 		}
 	},
 	mounted(){
+		//打开vue-socket.io
+		this.$socket.open();
+		console.log(this.$socket);
+		
 		this.username = this.$store.state.username;
 		var _this = this;
+		// _this.success = true;
+		// _this.init();
+		// _this.animate();
 		//刷新页面则重定向到登录页面
 		window.addEventListener('beforeunload', e => {
 			_this.logout();
 		});
 		//窗口改变大小时，改变canvas大小
-		window.addEventListener('resize', this.onWindowResize);
-		//打开vue-socket.io
-		this.$socket.open()
-	},
-	sockets:{
-		connect: function(){
-			console.log('Socket 连接成功');
-		},
-		disconnect: function(){
-			console.log('Socket 断开连接');
-		},
-		connected: function(data){
+		window.addEventListener('resize', _this.onWindowResize);
+		
+		this.sockets.subscribe('connect', () => {
+			console.log('Socket连接成功');
+		});
+		this.sockets.subscribe('disconnect', () => {
+			console.log('Socket断开连接');
+			//调用vuex mutations中logout方法
+			this.$store.commit('logout');
+			//重定向到登录界面
+			this.$router.push('/login');
+		});
+		this.sockets.subscribe('connected', (data) => {
 			console.log('Socket connected');
 			let warning = document.querySelector('#warning');
 			if(data.message === "success"){
-				this.success = true;
-				this.init();
-				this.animate();
+				_this.success = true;
+				_this.init();
+				_this.animate();
 			}
 			else{
 				warning.innerHTML = '与服务器连接失败';
 			}
-		},
-		disconnected: function(data){
-			console.log(data.message);
-		}
+		});
+		this.sockets.subscribe('disconnected',(data) => {
+			console.log('Socket disconnected');
+		})
+		
+		
 	},
 	beforeDestroy(){
 		this.logout();
+		this.sockets.unsubscribe('connect');
+		this.sockets.unsubscribe('disconnect');
+		this.sockets.unsubscribe('connected');
 	}
 
 }

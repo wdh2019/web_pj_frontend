@@ -12,24 +12,24 @@ module.exports = {
     proxyTable: {
       '/api': { //http请求，主要是axios
         target: 'http://localhost:8080',
-		secure: false,
+        secure: false,
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''
         }
       },
-	  '/socket.io':{ //websocket请求
-		target: 'http://localhost:8081',
-		// ws: true,
-		// secure: false,
-		changeOrigin: true,
-		logLevel: 'debug'
-	  },
-	  '/sockjs-node':{
-		  target: 'http://localhost:8081',
-		  ws: false,
-		  changeOrigin: true
-	  }
+      '/socket.io':{ //websocket请求
+        target: 'http://localhost:8081',
+        ws: true,
+        secure: false,
+        changeOrigin: true,
+        logLevel: 'debug'
+      },
+      '/sockjs-node':{
+        target: 'http://localhost:8081',
+        ws: false,
+        changeOrigin: true
+      }
     },
 
     // Various Dev Server settings

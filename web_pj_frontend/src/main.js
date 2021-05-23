@@ -20,14 +20,16 @@ Vue.prototype.$axios = axios
 axios.defaults.baseURL = '/api'
 axios.defaults.withCredentials = true
 axios.defaults.headers.post['Content-Type'] = "application/json;charset=UTF-8"
+const options = {
+	autoConnect: false,
+	transports: ['websocket']
+}
 Vue.use(
 	new VueSocketIO({
 		debug: true,
-		//connection: 'http://localhost:8081',
-		connection: 'http://54.205.181.44:8081',
-		options:{
-			autoConnect: false
-		},
+		connection: 'http://localhost:8081',
+		//connection: 'http://54.205.181.44:8081',
+		options:options,
 	})
 )
 
