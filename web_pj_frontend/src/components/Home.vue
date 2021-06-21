@@ -1,18 +1,20 @@
 <template>
 	<div class="container">
-		<el-row id="header">
-			<el-col :offset="20" :span="3" :xs="3" :sm="3" :md="3" :lg="3" :xl="3"><i class="el-icon-user"></i> <span>用户{{username}}</span></el-col>
-			<el-col :span="1" :xs="1" :sm="1" :md="1" :lg="1" :xl="1"><el-button class="solid_button" @click="logout">登出</el-button></el-col>
-		</el-row>
-		<h3 id="warning" v-if="!success"></h3>
+		<div id="header">
+			<div class="userInfo"><i class="el-icon-user"></i> <span>用户{{username}}</span></div>
+			<div class="logout"><el-button class="solid_button" @click="logout">登出</el-button></div>
+		</div>
 		<div id="main"></div>
+		<chat-room :chat-data="chatData" :socket="socket"></chat-room>
 	</div>
 </template>
 <script>
 	import * as Three from 'three'
+	import chatRoom from './ChatRoom.vue'
 
 	export default {
 		name: 'home',
+		components:{ chatRoom },
 		data () {
 			return {
 			camera: null,
@@ -21,6 +23,9 @@
 			mesh: null,
 			username: null,
 			success: false,
+      socket: null,
+      //从updateChar事件获取的聊天数据对象
+      chatData: {},
 		}
 		},
 	methods: {
@@ -56,25 +61,29 @@
 		logout(){
 			//关闭连接
 			this.$socket.close();
+      //调用vuex mutations中logout方法
+      this.$store.commit('logout');
+      //重定向到登录界面
+      this.$router.push('/login');
 		}
 	},
 	mounted(){
 		//打开vue-socket.io
 		this.$socket.open();
+    //socket传入子组件chatRoom
+    this.socket = this.$socket;
 		console.log(this.$socket);
-		
+
 		this.username = this.$store.state.username;
 		var _this = this;
-		// _this.success = true;
-		// _this.init();
-		// _this.animate();
 		//刷新页面则重定向到登录页面
 		window.addEventListener('beforeunload', e => {
 			_this.logout();
 		});
 		//窗口改变大小时，改变canvas大小
 		window.addEventListener('resize', _this.onWindowResize);
-		
+
+    //socket订阅事件
 		this.sockets.subscribe('connect', () => {
 			console.log('Socket连接成功');
 		});
@@ -86,28 +95,34 @@
 			this.$router.push('/login');
 		});
 		this.sockets.subscribe('connected', (data) => {
-			console.log('Socket connected');
-			let warning = document.querySelector('#warning');
+			console.log('接收到connected事件');
 			if(data.message === "success"){
 				_this.success = true;
 				_this.init();
 				_this.animate();
 			}
 			else{
-				warning.innerHTML = '与服务器连接失败';
+				console.log('未接收到connected事件');
 			}
 		});
 		this.sockets.subscribe('disconnected',(data) => {
-			console.log('Socket disconnected');
-		})
-		
-		
+			console.log('接收到disconnected事件');
+		});
+
+    //订阅聊天室事件
+    this.sockets.subscribe('updateChat', (data) => {
+      console.log('接收到聊天事件updateChat');
+      this.chatData = data;
+
+    })
 	},
 	beforeDestroy(){
 		this.logout();
 		this.sockets.unsubscribe('connect');
 		this.sockets.unsubscribe('disconnect');
 		this.sockets.unsubscribe('connected');
+    this.sockets.unsubscribe('disconnected');
+    this.sockets.unsubscribe('updateChat');
 	}
 
 }
@@ -115,23 +130,36 @@
 
 <style scoped>
 	.container{
-		width: 100%;
-		height: 100%;
+		width: 100vw;
+		height: 100vh;
 	}
+  .container>div,h3 {
+    margin: 0;
+  }
 	#header{
 		background-color: rgba(0,0,0,0.8);
 		color: white;
 		text-align: center;
+    width: 100vw;
+    height: 5vh;
+    position: relative;
+
 	}
-	#header .el-col{
+	#header>div{
 		line-height: 3.125rem;
+    display: inline-block;
 	}
-	#warning{
-		text-align: center;
-	}
+  #header .userInfo {
+    position: absolute;
+    right: 200px;
+  }
+  #header .logout{
+    position: absolute;
+    right: 10px;;
+  }
 	#main {
-		width: 100%;
-		height: 100%;
+		width: 100vw;
+    height: 95vh;
 	}
 	/* 按钮样式 */
 	.el-button.solid_button{

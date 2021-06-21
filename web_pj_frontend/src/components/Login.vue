@@ -62,8 +62,6 @@
 </template>
 
 <script>
-	//import io from 'socket.io-client'
-	//const socket = io('http://127.0.0.1:8081');
 	var socket;
 	export default{
 		name:'login',
@@ -113,8 +111,12 @@
 					})
 						.then(resp => {
 							if (resp.status === 200 && resp.data.message === "success") { //登录成功
-								this.$store.commit('login', {
-									username: this.loginForm.loginUsername
+								let {user, token} = resp.data;
+                console.log('接收到登录用户信息',user);
+                this.$store.commit('login', {
+                  userId: user.userId,
+									username: this.loginForm.loginUsername,
+                  token: token
 								});
 								this.$router.push("/home");
 							}
@@ -142,8 +144,12 @@
 					})
 						.then(resp => {
 							if (resp.status === 200 && resp.data.message === "success") { //注册成功
-								this.$store.commit('login', { // 保存username，和login一样
-									username: this.registerForm.registerUsername
+								let {user, token} = resp.data;
+                console.log('接收到注册用户信息',user);
+                this.$store.commit('login', { // 保存username，和login一样
+									userId: user.userId,
+									username: this.loginForm.loginUsername,
+									token: token
 								});
 								this.$router.push("/home");
 							}
