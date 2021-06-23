@@ -17,16 +17,18 @@
 		components:{ chatRoom },
 		data () {
 			return {
-			camera: null,
-			scene: null,
-			renderer: null,
-			mesh: null,
-			username: null,
-			success: false,
-      socket: null,
-      //从updateChar事件获取的聊天数据对象
-      chatData: {},
-		}
+        // three.js变量
+        camera: null,
+        scene: null,
+        renderer: null,
+        mesh: null,
+        // 用户名
+        username: null,
+        // socket对象，传入聊天室子组件
+        socket: null,
+        // 聊天数据对象，传入聊天室子组件
+        chatData: {},
+      }
 		},
 	methods: {
 		init() {
@@ -90,14 +92,13 @@
 		this.sockets.subscribe('disconnect', () => {
 			console.log('Socket断开连接');
 			//调用vuex mutations中logout方法
-			this.$store.commit('logout');
-			//重定向到登录界面
-			this.$router.push('/login');
+			// this.$store.commit('logout');
+			// //重定向到登录界面
+			// this.$router.push('/login');
 		});
 		this.sockets.subscribe('connected', (data) => {
 			console.log('接收到connected事件');
 			if(data.message === "success"){
-				_this.success = true;
 				_this.init();
 				_this.animate();
 			}
