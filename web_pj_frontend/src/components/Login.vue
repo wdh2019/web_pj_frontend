@@ -82,7 +82,7 @@
       <div class="panel right-panel">
         <div class="content">
           <h2>已注册？</h2>
-          <p>点击下面的注册按钮跳转到注册界面进行注册吧！</p>
+          <p>点击下面的登录按钮跳转到登录界面进行登录吧！</p>
           <button class="solid_button transparent" @click="changeMode('login')" >登录</button>
         </div>
 
