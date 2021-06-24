@@ -5,7 +5,7 @@
 			<div class="logout"><el-button class="solid_button" @click="logout">登出</el-button></div>
 		</div>
 		<div id="main"></div>
-		<chat-room :chat-data="chatData" :socket="socket"></chat-room>
+		<chat-room :chatData="chatData" :socket="socket"></chat-room>
 	</div>
 </template>
 <script>
@@ -27,7 +27,7 @@
         // socket对象，传入聊天室子组件
         socket: null,
         // 聊天数据对象，传入聊天室子组件
-        chatData: {},
+        chatData: [],
       }
 		},
 	methods: {
@@ -113,7 +113,8 @@
     //订阅聊天室事件
     this.sockets.subscribe('updateChat', (data) => {
       console.log('接收到聊天事件updateChat');
-      this.chatData = data;
+      this.chatData.push(data);
+      console.log("在父组件home中，聊天数据是", this.chatData);
 
     })
 	},

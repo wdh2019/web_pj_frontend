@@ -68,25 +68,27 @@
     watch:{
       chatData: {  //监听chatData属性
         handler(newV, oldV){
-          console.log(newV, oldV);
-          let {userId, username, messageType, message} = newV;
+          console.log("聊天室子组件接收到了父组件home的聊天数据",newV);
           if(newV){
             let chatMain = document.getElementsByClassName('mainContainer')[0];
-            let template = document.createElement('div');
-            let node = document.createElement('p');
-            template.style.textAlign = "left";
-            //template.style.whiteSpace = "nowrap";
-            template.style.overflow = "hidden";
-            template.style.textOverflow = "ellipsis";
-            node.style.margin = "0";
-            if(messageType == 'Broadcast') {
-              node.innerHTML = `<span class='strong'>[世界]广播</span>: ${message}`;
-            }
-            else if(messageType == 'Chat'){
-              node.innerHTML = `<span class='strong'>[用户]${username}</span>: ${message}`;
-            }
-            template.appendChild(node);
-            chatMain.appendChild(template);
+            newV.forEach((item, index)=>{
+              let {userId, username, messageType, message} = newV[index];
+              console.log("聊天数据的每一条信息是",newV[index]);
+              let template = document.createElement('div');
+              let node = document.createElement('p');
+              template.style.textAlign = "left";
+              template.style.overflow = "hidden";
+              template.style.textOverflow = "ellipsis";
+              node.style.margin = "0";
+              if(messageType == 'Broadcast') {
+                node.innerHTML = `<span class='strong'>[世界]广播</span>: ${message}`;
+              }
+              else if(messageType == 'Chat'){
+                node.innerHTML = `<span class='strong'>[用户]${username}</span>: ${message}`;
+              }
+              template.appendChild(node);
+              chatMain.appendChild(template);
+            })
           }
         },
         deep: true
