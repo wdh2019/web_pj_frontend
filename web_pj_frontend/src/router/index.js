@@ -34,6 +34,14 @@ export const router = new Router({
 		//   requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
 		// },
 	},
+  {
+    path: '/info',
+    name: 'info',
+    component: () => import('@/components/Information'),
+    // meta: {
+    //   requireAuth: true,
+    // }
+  }
   ]
 })
 
@@ -53,17 +61,16 @@ router.beforeEach(function (to, from, next) {
 	else {
 		next()
 	}
-	
+
 	if (to.fullPath === "/" || to.fullPath === "/login") {
 		if (sessionStorage.getItem('username')) {
 			next({
 			path: from.fullPath
 			});
-		} 
+		}
 		else {
 			next();
 		}
 	}
 
 });
-
