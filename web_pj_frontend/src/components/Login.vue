@@ -185,6 +185,7 @@
             })
 						.then(resp => {
 							if (resp.status === 200 && resp.data.message === "success") { //登录成功
+                console.log(resp);
                 let {user, token} = resp.data;
                 console.log('接收到登录用户信息',user);
                 this.$store.commit('login', {
@@ -212,7 +213,6 @@
 			register(){
 				this.$refs['registerForm'].validate((valid)=>{
 					if (valid) {
-            // console.log(this.registerForm.registerUsername,this.registerForm.registerPassword, this.registerForm.registerGender, +this.registerForm.registerAge);
 						this.$axios.post('/register', {
 							username: this.registerForm.registerUsername,
 							password: this.registerForm.registerPassword,
@@ -221,7 +221,8 @@
             })
 						.then(resp => {
 							if (resp.status === 200 && resp.data.message === "success") { //注册成功
-								let {user, token} = resp.data;
+								console.log(resp);
+                let {user, token} = resp.data;
                 console.log('接收到注册用户信息',user);
                 this.$store.commit('login', {
 									userId: user.userId,

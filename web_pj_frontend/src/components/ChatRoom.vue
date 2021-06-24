@@ -71,56 +71,31 @@
           console.log("聊天室子组件接收到了父组件home的聊天数据",newV);
           if(newV){
             let chatMain = document.getElementsByClassName('mainContainer')[0];
-            newV.forEach((item, index)=>{
-              let {userId, username, messageType, message} = newV[index];
-              console.log("聊天数据的每一条信息是",newV[index]);
-              let template = document.createElement('div');
-              let node = document.createElement('p');
-              template.style.textAlign = "left";
-              template.style.overflow = "hidden";
-              template.style.textOverflow = "ellipsis";
-              node.style.margin = "0";
-              if(messageType == 'Broadcast') {
-                node.innerHTML = `<span class='strong'>[世界]广播</span>: ${message}`;
-              }
-              else if(messageType == 'Chat'){
-                node.innerHTML = `<span class='strong'>[用户]${username}</span>: ${message}`;
-              }
-              template.appendChild(node);
-              chatMain.appendChild(template);
-            })
+            let {userId, username, messageType, message} = newV;
+            let template = document.createElement('div');
+            let node = document.createElement('p');
+            template.style.textAlign = "left";
+            template.style.overflow = "hidden";
+            template.style.textOverflow = "ellipsis";
+            node.style.margin = "0";
+            if(messageType == 'Broadcast') {
+              node.innerHTML = `<span class='strong'>[世界]广播</span>: ${message}`;
+            }
+            else if(messageType == 'Chat'){
+              node.innerHTML = `<span class='strong'>[用户]${username}</span>: ${message}`;
+            }
+            else {
+              console.log(messageType);
+              console.log(node.innerHTML,template.innerHTML);
+            }
+
+            template.appendChild(node);
+            chatMain.appendChild(template);
           }
         },
         deep: true
       }
     },
-    mounted() {
-      /* 调试聊天室消息*/
-      // let newV = {
-      //   userId: 111,
-      //   username: 'wangdonghui',
-      //   messageType: 'Chat',
-      //   message: '的结束啦福建省多了几分临时冻结阿法拉三等奖傅雷家书大量副科级ADSL房间里的市解放路萨菲罗斯看得见法拉盛杰弗里斯即连接',
-      // }
-      // let {userId, username, messageType, message} = newV;
-      // console.log(newV);
-      // let chatMain = document.getElementsByClassName('mainContainer')[0];
-      // let template = document.createElement('div');
-      // let node = document.createElement('p');
-      // template.style.textAlign = "left";
-      // //template.style.whiteSpace = "nowrap";
-      // template.style.overflow = "hidden";
-      // template.style.textOverflow = "ellipsis";
-      // node.style.margin = "0";
-      // if(messageType == 'Broadcast') {
-      //   node.innerHTML = `<span class='strong'>[世界]广播</span>: ${message}`;
-      // }
-      // else if(messageType == 'Chat'){
-      //   node.innerHTML = `<span class='strong'>[用户]${username}</span>: ${message}`;
-      // }
-      // template.appendChild(node);
-      // chatMain.appendChild(template);
-    }
 
   }
 </script>
@@ -216,7 +191,6 @@
   .inputContainer {
     height: 15%;
     min-height: 10%;
-    background-color: white;
   }
 
   .inputContainer .el-form {
@@ -240,7 +214,4 @@
     color: white;
     cursor: pointer;
   }
-
-
-
 </style>

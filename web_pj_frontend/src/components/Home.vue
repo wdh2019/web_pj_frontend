@@ -27,7 +27,7 @@
         // socket对象，传入聊天室子组件
         socket: null,
         // 聊天数据对象，传入聊天室子组件
-        chatData: [],
+        chatData: {},
       }
 		},
 	methods: {
@@ -71,7 +71,9 @@
 	},
 	mounted(){
 		//打开vue-socket.io
-		this.$socket.open();
+    // 第一次登录时连接socket，后续刷新不连接
+    this.$socket.open();
+    console.log("open");
     //socket传入子组件chatRoom
     this.socket = this.$socket;
 		console.log(this.$socket);
@@ -91,10 +93,6 @@
 		});
 		this.sockets.subscribe('disconnect', () => {
 			console.log('Socket断开连接');
-			//调用vuex mutations中logout方法
-			// this.$store.commit('logout');
-			// //重定向到登录界面
-			// this.$router.push('/login');
 		});
 		this.sockets.subscribe('connected', (data) => {
 			console.log('接收到connected事件');
@@ -113,18 +111,17 @@
     //订阅聊天室事件
     this.sockets.subscribe('updateChat', (data) => {
       console.log('接收到聊天事件updateChat');
-      this.chatData.push(data);
+      this.chatData = JSON.parse(data);
       console.log("在父组件home中，聊天数据是", this.chatData);
 
     })
 	},
 	beforeDestroy(){
-		this.logout();
 		this.sockets.unsubscribe('connect');
 		this.sockets.unsubscribe('disconnect');
 		this.sockets.unsubscribe('connected');
-    this.sockets.unsubscribe('disconnected');
-    this.sockets.unsubscribe('updateChat');
+		this.sockets.unsubscribe('disconnected');
+		this.sockets.unsubscribe('updateChat');
 	}
 
 }

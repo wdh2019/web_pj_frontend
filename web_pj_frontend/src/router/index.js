@@ -30,17 +30,17 @@ export const router = new Router({
 		path: '/home',
 		name: 'home',
 		component: () => import('@/components/Home'),
-		// meta: {
-		//   requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
-		// },
+		 meta: {
+		   requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
+		 },
 	},
   {
     path: '/info',
     name: 'info',
     component: () => import('@/components/Information'),
-    // meta: {
-    //   requireAuth: true,
-    // }
+     meta: {
+       requireAuth: true,
+     }
   }
   ]
 })
@@ -54,6 +54,7 @@ router.beforeEach(function (to, from, next) {
 		else {
 			next({
 			path: '/login',
+      replace: true,
 			// query: {redirect: to.fullPath} // 登录成功之后重新跳转到该路由
 			});
 		}
@@ -65,7 +66,7 @@ router.beforeEach(function (to, from, next) {
 	if (to.fullPath === "/" || to.fullPath === "/login") {
 		if (sessionStorage.getItem('username')) {
 			next({
-			path: from.fullPath
+        path: from.fullPath
 			});
 		}
 		else {
