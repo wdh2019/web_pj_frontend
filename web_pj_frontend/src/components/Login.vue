@@ -179,34 +179,81 @@
 			login(){
 				this.$refs['loginForm'].validate((valid)=>{
 					if (valid) {
-						this.$axios.post('/login', {
-							username: this.loginForm.loginUsername,
-							password: this.loginForm.loginPassword
-            })
-						.then(resp => {
-							if (resp.status === 200 && resp.data.message === "success") { //登录成功
-                console.log(resp);
-                let {user, token} = resp.data;
-                console.log('接收到登录用户信息',user);
+            if(this.loginForm.loginUsername === "admin" && this.loginForm.loginPassword === "123456"){
+              this.$confirm('恭喜你发现管理员账号，是否登录以查看后台页面？', '这不是一个彩蛋',{
+              	confirmButtonText: '确定',
+                cancelButtonText: '取消',
+              	type: 'success'
+              })
+              .then(()=>{
                 this.$store.commit('login', {
-                  userId: user.userId,
-									username: this.loginForm.loginUsername,
-                  token: token
-								});
-								this.$router.push("/home");
-							}
-							else {
-								this.$message({
-									showClose: true,
-									message: "登录失败",
-									type: 'warning'
-								});
-								console.log(resp.data.message);
-							}
-					    })
-						.catch(error => {
-							console.log(error);
-					    })
+                  userId: -1,
+                	username: 'admin',
+                  token: null
+                });
+                this.$router.push("/info");
+              })
+              .catch(()=>{
+                  this.$axios.post('/login', {
+                  	username: this.loginForm.loginUsername,
+                  	password: this.loginForm.loginPassword
+                  })
+                  .then(resp => {
+                  	if (resp.status === 200 && resp.data.message === "success") { //登录成功
+                      console.log(resp);
+                      let {user, token} = resp.data;
+                      console.log('接收到登录用户信息',user);
+                      this.$store.commit('login', {
+                        userId: user.userId,
+                  			username: this.loginForm.loginUsername,
+                        token: token
+                  		});
+                  		this.$router.push("/home");
+                  	}
+                  	else {
+                  		this.$message({
+                  			showClose: true,
+                  			message: "登录失败",
+                  			type: 'warning'
+                  		});
+                  		console.log(resp.data.message);
+                  	}
+                    })
+                  .catch(error => {
+                  	console.log(error);
+                    })
+              })
+            }
+            else{
+              this.$axios.post('/login', {
+              	username: this.loginForm.loginUsername,
+              	password: this.loginForm.loginPassword
+              })
+              .then(resp => {
+              	if (resp.status === 200 && resp.data.message === "success") { //登录成功
+                  console.log(resp);
+                  let {user, token} = resp.data;
+                  console.log('接收到登录用户信息',user);
+                  this.$store.commit('login', {
+                    userId: user.userId,
+              			username: this.loginForm.loginUsername,
+                    token: token
+              		});
+              		this.$router.push("/home");
+              	}
+              	else {
+              		this.$message({
+              			showClose: true,
+              			message: "登录失败",
+              			type: 'warning'
+              		});
+              		console.log(resp.data.message);
+              	}
+                })
+              .catch(error => {
+              	console.log(error);
+                })
+            }
 					}
 				});
 			},
