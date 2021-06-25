@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    userId: sessionStorage.getItem('userId') || null,
 	  username: sessionStorage.getItem('username') || null,
   },
   mutations: {
