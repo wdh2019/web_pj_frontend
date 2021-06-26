@@ -67,6 +67,7 @@ export default {
     logout() {
       //关闭连接
       this.$socket.close();
+      this.$refs.hanoi.handleLeave();
       this.sockets.unsubscribe("connect");
       this.sockets.unsubscribe("disconnect");
       this.sockets.unsubscribe("connected");

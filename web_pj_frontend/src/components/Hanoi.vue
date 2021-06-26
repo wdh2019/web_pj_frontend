@@ -23,7 +23,6 @@ export default {
       scene: null,
       renderer: null,
       orbitControls: null,
-      mobileControls: null,
       moveForward: false,
       moveLeft: false,
       moveBackward: false,
@@ -123,20 +122,7 @@ export default {
         this.scene.add(disk);
       }
       //渲染自己的模型
-      let group = new Three.Group();
-      loader.load("static/Gray rhino.glb", (mesh) => {
-        mesh.scene.position.set(0, 0, 0);
-        mesh.scene.scale.set(10, 10, 10);
-        //    let AnimationAction=mixer.clipAction(mesh.animations[1]);
-        //    AnimationAction.play();
-        group.add(mesh.scene);
-        group.position.set(0, 30, -500);
-      });
-      this.scene.add(group);
-      // 将角色对应关系加到 players 和 playersInfo map 中
-      this.players.set(this.userId, group);
-      console.log(group);
-      this.playersInfo.set(this.userId, this.userName);
+      this.addModel(this.userId, this.userName, [0, 30, -500]);
     },
 
     //渲染循环
@@ -178,8 +164,8 @@ export default {
       }
     },
 
-    onKeyDown(e){
-      if(!this.controlLock){
+    onKeyDown(e) {
+      if (!this.controlLock) {
         switch (e.key) {
           case "a":
             this.moveLeft = true;
@@ -196,12 +182,16 @@ export default {
           case "f":
             this.diskAction();
             break;
+          case "t":
+            this.players.forEach((element) => {
+              console.log(element.position);
+            });
         }
       }
     },
 
-    onKeyUp(e){
-      if(!this.controlLock){
+    onKeyUp(e) {
+      if (!this.controlLock) {
         switch (e.key) {
           case "a":
             this.moveLeft = false;
@@ -238,6 +228,7 @@ export default {
     addModel(userId, userName, position) {
       //新增角色模型
       const loader = new GLTFLoader();
+      const textLoader = new Three.FontLoader();
       let group = new Three.Group();
       loader.load("static/Gray rhino.glb", (mesh) => {
         mesh.scene.position.set(0, 0, 0);
@@ -246,8 +237,26 @@ export default {
         //    AnimationAction.play();
         group.add(mesh.scene);
         group.position.set(...position);
+        this.scene.add(group);
       });
-      this.scene.add(group);
+
+      textLoader.load("static/Bauhaus 93_Regular.json", (font) => {
+        let textGeometry = new Three.TextGeometry(userId + "", {
+          font: font,
+          size: 10,
+          height: 5,
+          bevelThickness: 1,
+          bevelSize: 8,
+        });
+        let textMesh = new Three.Mesh(
+          textGeometry,
+          new Three.MeshLambertMaterial({ color: 0xaf32e8 })
+        );
+        textMesh.scale.set(-3, 3, 1);
+        textMesh.position.set(0, 150, 0);
+        group.add(textMesh);
+      });
+
       // 将角色对应关系加到 players 和 playersInfo map 中
       this.players.set(userId, group);
       this.playersInfo.set(userId, userName);
@@ -276,15 +285,19 @@ export default {
       this.scene.remove(this.players.get(userId));
       delete this.players[userId];
       delete this.playersInfo[userId];
-      if (this.hold !== 3) return;
-      if (
-        this.diskPositions[this.diskSelected].location === 4 &&
-        this.diskPositions[this.diskSelected].position === userId
-      ) {
-        this.hold = 1;
-        this.dropObject(userId, this.diskSelected, this.columnNearBy);
-        this.sendDisk();
-      }
+      console.log("leavs");
+      // if (
+      // ) {
+      //   this.hold = 1;
+      //   this.dropObject(userId, this.diskSelected, this.columnNearBy);
+      //   this.sendDisk();
+      // }
+    },
+
+    //处理自己登出，将map清空，会在logout时被父组件调用
+    handleLeave() {
+      this.players = new Map();
+      this.playersInfo = new Map();
     },
 
     //监听盘子的移动
@@ -297,6 +310,7 @@ export default {
       this.diskModels[id].position.set(...position);
       this.diskLocations[id] = location;
     },
+    //监听角色的移动
     handleMovePosition(userId, newPosition) {
       if (userId === this.userId) return;
       this.players
@@ -304,6 +318,7 @@ export default {
         .position.set(newPosition[0], newPosition[1], newPosition[2]);
       // console.log(this.players.get(userId).position);
     },
+    //处理在连接前就存在的角色形象
     handleUsersPosition(userId, userName, userPosition) {
       if (userId === this.userId) return;
       this.addModel(userId, userName, userPosition);
@@ -388,6 +403,7 @@ export default {
         return;
       } else {
         //判断盘子是否可以放置
+        //即判断columnNearBy最上面的柱子是否是index小，小则说明是小盘子
         let minNum = 4;
         for (let i = 0; i < this.diskCount; i++) {
           if (this.diskLocations[i] === this.columnNearBy) {
@@ -395,13 +411,11 @@ export default {
             break;
           }
         }
-        console.log(this.diskLocations);
         if (minNum < this.diskSelected) {
           this.$message.warning("大盘子不得放在小盘子上方");
           return;
         }
         this.hold = -1;
-        console.log(this.columnNearBy);
         this.dropDisk(this.userId, this.diskSelected, this.columnNearBy);
         this.sendDisk(
           this.diskSelected,
@@ -412,9 +426,9 @@ export default {
         );
       }
     },
-
+    //更新columnNearBy 和 diskSelected的值
     judgeDisk() {
-      //判断是否在一根柱子边
+      //判断是否在一根柱子附近
       this.columnNearBy = -1;
       for (let i = 0; i < 3; i++) {
         if (
@@ -428,7 +442,7 @@ export default {
       }
 
       //找到会操作到的盘子
-      //已经拿着就返回拿着的盘子
+      //已经拿着，就返回拿着的盘子
       if (this.hold >= 0) {
         this.diskSelected = this.hold;
         return;
@@ -447,7 +461,25 @@ export default {
       for (let i = 0; i < this.diskCount; i++) {
         if (this.diskLocations[i] !== 2) return;
       }
-      this.$message.success("成功啦！");
+      this.$message.success("成功！即将刷新新一轮");
+     // setTimeout(this.reset(), 30000);
+      this.socket.emit("success", "success");
+    },
+    //重置人和盘子
+    reset() {
+      this.players.forEach((element) => {
+        element.position.set(0, 30, 0);
+      });
+      for (let i = 0; i < this.diskCount; i++) {
+        this.diskModels[i].position.set(-200, 55 - i * 10, 100);
+        this.diskPositions[i] = this.diskModels[i].position;
+        this.diskLocations[i] = 0;
+      }
+      this.hold = -1;
+      this.diskSelected = -1;
+      this.columnNearBy = -1;
+      this.sendPosition();
+      this.sendDisk();
     },
   },
   mounted() {
@@ -456,15 +488,15 @@ export default {
     window.addEventListener("resize", this.onWindowResize);
     this.init();
     //通过总线监听lockControl事件，获取值
-    this.$bus.$on('lockControl',(val)=>{
+    this.$bus.$on("lockControl", (val) => {
       this.controlLock = val;
     });
   },
   destroyed() {
     window.removeEventListener("keyup", this.onKeyUp);
     window.removeEventListener("keydown", this.onKeyDown);
-    window.removeEventListener("resize,",this.onWindowResize);
-    this.$bus.$off('lockControl');
+    window.removeEventListener("resize,", this.onWindowResize);
+    this.$bus.$off("lockControl");
   },
 };
 </script>
