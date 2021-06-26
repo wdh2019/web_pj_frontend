@@ -205,7 +205,7 @@
                       console.log('接收到登录用户信息',user);
                       this.$store.commit('login', {
                         userId: user.userId,
-                  			username: this.loginForm.loginUsername,
+                        username: user.username,
                         token: token
                   		});
                   		this.$router.push("/home");
@@ -273,9 +273,10 @@
                 console.log('接收到注册用户信息',user);
                 this.$store.commit('login', {
 									userId: user.userId,
-									username: this.loginForm.loginUsername,
+									username: user.username,
 									token: token
 								});
+                console.log(this.$store.state);
 								this.$router.push("/home");
 							}
 							else {
