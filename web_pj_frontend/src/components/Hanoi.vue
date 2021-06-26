@@ -13,7 +13,7 @@ import SkyUtils from "./SkyUtils";
 export default {
   name: "Hanoi",
   //从父组件获取建立的socket链接
-  props: ["socket", "controlLock"],
+  props: ["socket"],
   data() {
     return {
       container: null,
@@ -38,6 +38,7 @@ export default {
       diskSelected: -1,
       columnNearBy: -1,
       diskCount: 3,
+      controlLock: false, //移动锁，false为可以移动，true为不可以移动
     };
   },
   methods: {
@@ -177,6 +178,47 @@ export default {
       }
     },
 
+    onKeyDown(e){
+      if(!this.controlLock){
+        switch (e.key) {
+          case "a":
+            this.moveLeft = true;
+            break;
+          case "s":
+            this.moveBackward = true;
+            break;
+          case "d":
+            this.moveRight = true;
+            break;
+          case "w":
+            this.moveForward = true;
+            break;
+          case "f":
+            this.diskAction();
+            break;
+        }
+      }
+    },
+
+    onKeyUp(e){
+      if(!this.controlLock){
+        switch (e.key) {
+          case "a":
+            this.moveLeft = false;
+            break;
+          case "s":
+            this.moveBackward = false;
+            break;
+          case "d":
+            this.moveRight = false;
+            break;
+          case "w":
+            this.moveForward = false;
+            break;
+        }
+      }
+    },
+
     //鼠标控制视角
     initOrbitControls() {
       this.orbitControls = new OrbitControls(
@@ -188,45 +230,8 @@ export default {
 
     //监听键盘，根据按键更改状态参量，以在render里更新渲染
     initMovementControl() {
-      let that = this;
-      let onKeyDown = function (e) {
-        switch (e.key) {
-          case "a":
-            that.moveLeft = true;
-            break;
-          case "s":
-            that.moveBackward = true;
-            break;
-          case "d":
-            that.moveRight = true;
-            break;
-          case "w":
-            that.moveForward = true;
-            break;
-          case "f":
-            that.diskAction();
-            break;
-        }
-      };
-      let onKeyUp = function (e) {
-        switch (e.key) {
-          case "a":
-            that.moveLeft = false;
-            break;
-          case "s":
-            that.moveBackward = false;
-            break;
-          case "d":
-            that.moveRight = false;
-            break;
-          case "w":
-            that.moveForward = false;
-            break;
-        }
-      };
-
-      document.addEventListener("keydown", onKeyDown, false);
-      document.addEventListener("keyup", onKeyUp, false);
+      document.addEventListener("keydown", this.onKeyDown, false);
+      document.addEventListener("keyup", this.onKeyUp, false);
     },
 
     //添加新的角色模型
@@ -449,8 +454,17 @@ export default {
     //this.diskModels = new Array(this.diskCount);
     this.container = document.getElementById("hanoi-scene");
     window.addEventListener("resize", this.onWindowResize);
-
     this.init();
+    //通过总线监听lockControl事件，获取值
+    this.$bus.$on('lockControl',(val)=>{
+      this.controlLock = val;
+    });
+  },
+  destroyed() {
+    window.removeEventListener("keyup", this.onKeyUp);
+    window.removeEventListener("keydown", this.onKeyDown);
+    window.removeEventListener("resize,",this.onWindowResize);
+    this.$bus.$off('lockControl');
   },
 };
 </script>

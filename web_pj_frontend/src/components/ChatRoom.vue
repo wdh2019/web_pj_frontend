@@ -1,19 +1,19 @@
 <template>
   <div>
     <div class="expandAside">
-      <button class="expand-btn" @click="expandChatRoom()">聊天室</button>
+      <button class="expand-btn" @click="expandChatRoom">聊天室</button>
       <i class="el-icon-arrow-right"></i>
     </div>
 
     <div id="chatRoom">
-      <button class="hide-btn" @click="hideChatRoom()"><i class="el-icon-arrow-left"></i></button>
+      <button class="hide-btn" @click="hideChatRoom"><i class="el-icon-arrow-left"></i></button>
       <div class="mainContainer">
 
       </div>
       <div class="inputContainer">
         <el-form>
-          <el-input type="textarea" placeholder="请输入文字" v-model="chatInput" @keyup.enter.native="submitChatInput($event)" @blur="setTimeOut()"/>
-          <button class="submit-btn" @click="submitChatInput()">发送</button>
+          <el-input type="textarea" placeholder="请输入文字" v-model="chatInput" @keyup.enter.native="submitChatInput"/>
+          <button class="submit-btn" @click="submitChatInput">发送</button>
         </el-form>
 
       </div>
@@ -34,21 +34,18 @@
     methods: {
       //展开聊天室
       expandChatRoom(){
+        this.$bus.$emit('lockControl', true); //向Hanoi组件发送lockControl事件，发送值为true，表示聊天时不能移动
         document.getElementById('chatRoom').classList.add('show');
         document.querySelector('div.expandAside').classList.add('hide');
       },
       //收回聊天框
       hideChatRoom(){
+        this.$bus.$emit('lockControl', false); //向Hanoi组件发送lockControl事件，发送值为false，表示关闭聊天可以移动
         document.getElementById('chatRoom').classList.remove('show');
         document.querySelector('div.expandAside').classList.remove('hide');
       },
-      //失去焦点后2秒收回聊天框
-      setTimeOut(){
-        setTimeout(this.hideChatRoom,2000);
-      },
       //提交聊天内容
-      submitChatInput(event){
-        if(!!event) event.preventDefault();
+      submitChatInput(){
         if(!this.chatInput) return false;
         let userId = sessionStorage.getItem('userId');
         let username = sessionStorage.getItem('username');

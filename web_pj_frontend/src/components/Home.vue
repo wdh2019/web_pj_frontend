@@ -10,7 +10,7 @@
     </div>
     <div id="main">
       <chat-room :chatData="chatData" :socket="socket"></chat-room>
-      <hanoi :socket="socket" :controlLock="controlLock" ref="hanoi"></hanoi>
+      <hanoi :socket="socket" ref="hanoi"></hanoi>
     </div>
   </div>
 </template>
@@ -193,6 +193,7 @@ export default {
     });
   },
   beforeDestroy() {
+    this.$socket.close();
     this.sockets.unsubscribe("connect");
     this.sockets.unsubscribe("disconnect");
     this.sockets.unsubscribe("connected");

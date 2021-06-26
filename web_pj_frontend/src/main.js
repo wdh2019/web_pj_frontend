@@ -14,12 +14,27 @@ import store from './store'
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.use(Vuex)
+Vue.prototype.$bus = new Vue();// 兄弟组件通信的总线实例
 //axios 配置
 // Axios挂载到Vue原型，全局可以使用this.$axios访问
 Vue.prototype.$axios = axios
 axios.defaults.baseURL = '/api'
 axios.defaults.withCredentials = true
 axios.defaults.headers.post['Content-Type'] = "application/json;charset=UTF-8"
+
+axios.interceptors.response.use(
+  response => {
+    if (response.data.hasOwnProperty("state")) {
+      const stateCode = response.data.state;
+      if (stateCode === 401) {
+        router.replace('/login')
+      }
+    }
+    return response
+  },
+)
+
+
 const options = {
 	autoConnect: false,
 	transports: ['websocket']
