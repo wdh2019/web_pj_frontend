@@ -67,6 +67,7 @@ export default {
     logout() {
       //关闭连接
       this.$socket.close();
+      //清空logout的页面的map，防止再次登录时map不是空的（mounted只执行一次）
       this.$refs.hanoi.handleLeave();
       this.sockets.unsubscribe("connect");
       this.sockets.unsubscribe("disconnect");
@@ -157,12 +158,12 @@ export default {
         newPosition
       );
     });
-
+    //订阅向链接中的其他人发送有人离开的消息
     this.sockets.subscribe("logout", (data) => {
       data = JSON.parse(data);
       this.$refs.hanoi.handlelLogout(data.userId);
     });
-
+    //有人移动盘子
     this.sockets.subscribe("moveDisk", (data) => {
       data = JSON.parse(data);
       let newPosition = data.position.split(",");
@@ -171,7 +172,7 @@ export default {
       });
       this.$refs.hanoi.handleMoveDisk(data.id, newPosition, data.location);
     });
-
+    //向新建立连接的人发送当前的盘子位置
     this.sockets.subscribe("chessPosition", (data) => {
       data = JSON.parse(data);
       let newPosition = data.position.split(",");

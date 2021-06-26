@@ -17,12 +17,16 @@ export default {
   data() {
     return {
       container: null,
+      //记录用户id和对应物件组的map
       players: new Map(),
+      //记录用户id和用户名字的map
       playersInfo: new Map(),
       camera: null,
       scene: null,
       renderer: null,
+      //用于摄像机变化
       orbitControls: null,
+      //用于移动的状态参量
       moveForward: false,
       moveLeft: false,
       moveBackward: false,
@@ -30,12 +34,19 @@ export default {
       userId: this.$store.state.userId,
       userName: this.$store.state.userName,
       columns: [],
+      //记录盘子模型
       diskModels: [],
+      //盘子位置{x:,y:,z:}
       diskPositions: [],
+      //盘子在哪根柱子上，以柱子的索引记录，3表示在人身上
       diskLocations: [],
+      //自己有没有拿着盘子+拿着哪个盘子
       hold: -1,
+      //记录会交互的盘子
       diskSelected: -1,
+      //记录相近的柱子索引
       columnNearBy: -1,
+      //盘子数
       diskCount: 3,
       controlLock: false, //移动锁，false为可以移动，true为不可以移动
     };
@@ -285,13 +296,7 @@ export default {
       this.scene.remove(this.players.get(userId));
       delete this.players[userId];
       delete this.playersInfo[userId];
-      console.log("leavs");
-      // if (
-      // ) {
-      //   this.hold = 1;
-      //   this.dropObject(userId, this.diskSelected, this.columnNearBy);
-      //   this.sendDisk();
-      // }
+
     },
 
     //处理自己登出，将map清空，会在logout时被父组件调用
@@ -354,6 +359,7 @@ export default {
 
     // 抬起盘子
     liftDisk(userId, num) {
+      //将盘子添加到角色的物件组中，方便位置管理，为此先删除页面上原有的模型
       this.scene.remove(this.diskModels[num]);
       this.diskModels[num].position.set(0, 70, 0);
       this.players.get(userId).add(this.diskModels[num]);
@@ -449,7 +455,7 @@ export default {
       }
 
       this.diskSelected = -1;
-
+      //找到柱子最上面的盘子
       for (let i = 0; i < this.diskCount; i++) {
         if (this.diskLocations[i] === this.columnNearBy) {
           this.diskSelected = i;
@@ -458,11 +464,12 @@ export default {
       }
     },
     judgeSuccess() {
+      //判断是否全部完成
       for (let i = 0; i < this.diskCount; i++) {
         if (this.diskLocations[i] !== 2) return;
       }
       this.$message.success("成功！即将刷新新一轮");
-     // setTimeout(this.reset(), 30000);
+      // setTimeout(this.reset(), 30000);
       this.socket.emit("success", "success");
     },
     //重置人和盘子
