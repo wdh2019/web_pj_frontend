@@ -37,13 +37,13 @@ axios.interceptors.response.use(
 
 const options = {
 	autoConnect: false,
-	transports: ['websocket']
+	transports: ['websocket','xhr-polling','jsonp-polling']
 }
 Vue.use(
 	new VueSocketIO({
-		debug: true,
-		connection: 'http://localhost:8081',
-		//connection: 'http://54.205.181.44:8081',
+		//debug: true,
+		//connection: 'http://localhost:8081',
+		connection: 'http://118.195.186.183:8081',
 		options:options,
 	})
 )

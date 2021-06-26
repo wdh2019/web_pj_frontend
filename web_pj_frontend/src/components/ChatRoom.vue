@@ -46,20 +46,19 @@
       },
       //提交聊天内容
       submitChatInput(){
-        if(!this.chatInput) return false;
-        let userId = sessionStorage.getItem('userId');
-        let username = sessionStorage.getItem('username');
-        if(this.socket) {
-          this.socket.emit('receiveChat', {
-            userId: userId,
-            username: username,
-            messageType: "Chat",
-            message: this.chatInput,
-          });
-          this.chatInput = "";
+        if(this.chatInput){
+          let userId = sessionStorage.getItem('userId');
+          let username = sessionStorage.getItem('username');
+          if(this.socket) {
+            this.socket.emit('receiveChat', {
+              userId: userId,
+              username: username,
+              messageType: "Chat",
+              message: this.chatInput,
+            });
+            this.chatInput = "";
+          }
         }
-
-        return false;
       }
     },
     watch:{
