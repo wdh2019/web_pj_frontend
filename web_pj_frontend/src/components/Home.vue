@@ -182,6 +182,14 @@ export default {
       this.$refs.hanoi.handleMoveDisk(data.id, newPosition, data.location);
     });
 
+    this.sockets.subscribe("success",(data)=>{
+      this.$message.success("成功！即将刷新新一轮");
+      let that  = this;
+      setTimeout(function(){
+        that.$refs.hanoi.reset();
+      }, 3000);
+    })
+
     //订阅聊天室事件
     this.sockets.subscribe("updateChat", (data) => {
       console.log("接收到聊天事件updateChat");

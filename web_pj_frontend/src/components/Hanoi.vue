@@ -389,7 +389,7 @@ export default {
       this.scene.add(this.diskModels[num]);
       this.diskLocations[num] = column;
       this.diskPositions[num] = this.diskModels[num].position;
-      this.judgeSuccess();
+      
     },
 
     //互动检测
@@ -430,6 +430,7 @@ export default {
           this.diskPositions[this.diskSelected].z,
           this.diskLocations[this.diskSelected]
         );
+        this.judgeSuccess();
       }
     },
     //更新columnNearBy 和 diskSelected的值
@@ -468,14 +469,17 @@ export default {
       for (let i = 0; i < this.diskCount; i++) {
         if (this.diskLocations[i] !== 2) return;
       }
-      this.$message.success("成功！即将刷新新一轮");
-      // setTimeout(this.reset(), 30000);
       this.socket.emit("success", "success");
+      let that = this;
+       setTimeout(function(){
+         that.reset()}
+         , 3000);
+      
     },
     //重置人和盘子
     reset() {
       this.players.forEach((element) => {
-        element.position.set(0, 30, 0);
+        element.position.set(0, 30, -500);
       });
       for (let i = 0; i < this.diskCount; i++) {
         this.diskModels[i].position.set(-200, 55 - i * 10, 100);
@@ -485,8 +489,6 @@ export default {
       this.hold = -1;
       this.diskSelected = -1;
       this.columnNearBy = -1;
-      this.sendPosition();
-      this.sendDisk();
     },
   },
   mounted() {
